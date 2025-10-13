@@ -5,6 +5,7 @@ RUN addgroup react && adduser -S -G react react
 USER react
 
 WORKDIR /app/
+RUN mkdir datos
 COPY --chown=react package*.json .
 RUN npm install
 COPY --chown=react . .
