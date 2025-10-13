@@ -1,4 +1,4 @@
-// Instrucciones para crear el repo en local
+<!-- --> Instrucciones para crear el repo en local
 
 echo "# apuntes-curso-Docker-Nicolas" >> README.md
 git init
