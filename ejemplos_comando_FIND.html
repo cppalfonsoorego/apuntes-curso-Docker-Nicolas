@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<!--[if IE 7]>
+<html class="ie ie7" lang="en-US">
+<![endif]-->
+<!--[if IE 8]>
+<html class="ie ie8" lang="en-US">
+<!/home/alfo/web-con-ejemplos-comando-find-FIND/web.html-->
+<!--[if !(IE 7) | !(IE 8)  ]><!-->
+<html lang="en-US">
+<body>
+<h3>1. List all files in current and sub directories</h3>
+<p>This command lists out all the files in the current directory as well as the subdirectories in the current directory.</p>
+<pre class="terminal" >$ find
+.
+./abc.txt
+./subdir
+./subdir/how.php
+./cool.php</pre>
+<p>The command is same as the following</p>
+<pre class="terminal" >$ find .
+$ find . -print</pre>
+<h3>2. Search specific directory or path</h3>
+<p>The following command will look for files in the test directory in the current directory. Lists out all files by default.</p>
+<pre class="terminal" >$ find ./test
+./test
+./test/abc.txt
+./test/subdir
+./test/subdir/how.php
+./test/cool.php</pre>
+<p>The following command searches for files by their name.</p>
+<pre class="terminal" >$ find ./test -name &quot;abc.txt&quot;
+./test/abc.txt</pre>
+<p>We can also use wildcards</p>
+<pre class="terminal" >$ find ./test -name &quot;*.php&quot;
+./test/subdir/how.php
+./test/cool.php</pre>
+<p>Note that all sub directories are searched recursively. So this is a very powerful way to find all files of a given extension.</p>
+<p>Trying to search the "/" directory which is the root, would search the entire file system including mounted devices and network storage devices. So be careful. Of course you can press Ctrl + c anytime to stop the command.</p>
+<pre class="highlight  ">When specifying the directory (&quot;./test&quot; in this example), its fine to omit the trailing slash. However, if the directory is actually a symlink to some other location then you MUST specify the trailing slash for it to work properly (find ./test/ ...)</pre>
+<p><b>Ignore the case</b></p>
+<p>It is often useful to ignore the case when searching for file names. To ignore the case, just use the "iname" option instead of the "name" option.</p>
+<pre class="terminal" >$ find ./test -iname &quot;*.Php&quot;
+./test/subdir/how.php
+./test/cool.php</pre>
+<pre class="highlight  ">Its always better to wrap the search term (name parameter) in double or single quotes. Not doing so will seem to work sometimes and give strange results at other times.</pre>
+<h3>3. Limit depth of directory traversal</h3>
+<p>The find command by default travels down the entire directory tree recursively, which is time and resource consuming. However the depth of directory travesal can be specified. For example we don't want to go more than 2 or 3 levels down in the sub directories. This is done using the maxdepth option.</p>		
+<!-- Time: 4.1961669921875E-5, Pos: 9128, Key: ad_unit_2 -->
+
+
+<pre class="terminal" >$ find ./test -maxdepth 2 -name &quot;*.php&quot;
+./test/subdir/how.php
+./test/cool.php
+
+$ find ./test -maxdepth 1 -name *.php
+./test/cool.php</pre>
+<p>The second example uses maxdepth of 1, which means it will not go lower than 1 level deep, either only in the current directory.</p>
+<p>This is very useful when we want to do a limited search only in the current directory or max 1 level deep sub directories and not the entire directory tree which would take more time.</p>
+<p>Just like maxdepth there is an option called mindepth which does what the name suggests, that is, it will go atleast N level deep before searching for the files.</p>
+<h3>4. Invert match</h3>
+<p>It is also possible to search for files that do no match a given name or pattern. This is helpful when we know which files to exclude from the search.</p>
+<pre class="terminal" >$ find ./test -not -name &quot;*.php&quot;
+./test
+./test/abc.txt
+./test/subdir</pre>
+<p>So in the above example we found all files that do not have the extension of php, either non-php files. The find command also supports the exclamation mark inplace of not.</p>
+<pre class="pre_text" >find ./test ! -name &quot;*.php&quot;</pre>
+<h3>5. Combine multiple search criterias</h3>
+<p>It is possible to use multiple criterias when specifying name and inverting. For example</p>
+<pre class="terminal" >$ find ./test -name &#039;abc*&#039; ! -name &#039;*.php&#039;
+./test/abc.txt
+./test/abc</pre>
+<p>The above find command looks for files that begin with abc in their names and do not have a php extension. This is an example of how powerful search expressions can be build with the find command.</p>
+<p><b>OR operator</b></p>
+<p>When using multiple name criterias, the find command would combine them with AND operator, which means that only those files which satisfy all criterias will be matched. However if we need to perform an OR based matching then the find command has the "o" switch.</p>
+<pre class="terminal" >$ find -name &#039;*.php&#039; -o -name &#039;*.txt&#039;
+./abc.txt
+./subdir/how.php
+./abc.php
+./cool.php</pre>
+<p>The above command search for files ending in either the php extension or the txt extension.</p>
+<h3>6. Search only files or only directories</h3>
+<p>Sometimes we want to find only files or only directories with a given name. Find can do this easily as well.</p>
+<pre class="terminal" >$ find ./test -name abc*
+./test/abc.txt
+./test/abc
+
+Only files
+
+$ find ./test -type f -name &quot;abc*&quot;
+./test/abc.txt
+
+Only directories
+
+$ find ./test -type d -name &quot;abc*&quot;
+./test/abc</pre>
+<p>Quite useful and handy!</p>
+<h3>7. Search multiple directories together</h3>
+<p>So lets say you want to search inside 2 separate directories. Again, the command is very simple</p>
+<pre class="terminal" >$ find ./test ./dir2 -type f -name &quot;abc*&quot;
+./test/abc.txt
+./dir2/abcdefg.txt</pre>		
+<!-- Time: 4.1007995605469E-5, Pos: 12648, Key: ad_unit_3 -->
+
+
+<p>Check, that it listed files from 2 separate directories.</p>
+<h3>8. Find hidden files</h3>
+<p>Hidden files on linux begin with a period. So its easy to mention that in the name criteria and list all hidden files.</p>
+<pre class="terminal" >$ find ~ -type f -name &quot;.*&quot;</pre>
+<h3>9. Find files with certain permissions</h3>
+<p>The find command can be used to find files with a specific permission using the "perm" option. The following command searches for files with the permission 0664</p>
+<pre class="terminal" >$ find . -type f -perm 0664
+./abc.txt
+./subdir/how.php
+./abc.php
+./cool.php</pre>
+<p>This can be useful to find files with wrong permissions which can lead to security issues. Inversion can also be applied to permission checking.</p>
+<pre class="terminal" >$ find . -type f ! -perm 0777
+./abc.txt
+./subdir/how.php
+./abc.php
+./cool.php</pre>
+<h3>10. Find files with sgid/suid bits set</h3>
+<p>The "perm" option of find command accepts the same mode string like chmod. The following command finds all files with permission 644 and sgid bit set.</p>
+<pre class="terminal" ># find / -perm 2644</pre>
+<p>Similarly use 1664 for sticky bit. The perm option also supports using an alternative syntax instead of octal numbers.</p>
+<pre class="terminal" >$ find / -maxdepth 2 -perm /u=s 2&gt;/dev/null
+/bin/mount
+/bin/su
+/bin/ping6
+/bin/fusermount
+/bin/ping
+/bin/umount
+/sbin/mount.ecryptfs_private</pre>
+<p>Note that the "2>/dev/null" removes those entries that have an error of "Permission Denied"</p>
+<h3>11. Find readonly files</h3>
+<p>Find all Read Only files.</p>
+<pre class="terminal" >$ find /etc -maxdepth 1 -perm /u=r
+/etc
+/etc/thunderbird
+/etc/brltty
+/etc/dkms
+/etc/phpmyadmin
+... output truncated ...</pre>
+<h3>12. Find executable files</h3>
+<p>The following command will find executable files</p>
+<pre class="terminal" >$ find /bin -maxdepth 2 -perm /a=x
+/bin
+/bin/preseed_command
+/bin/mount
+/bin/zfgrep
+/bin/tempfile
+... output truncated ...</pre>
+<h3>13. Find files owned to particular user</h3>
+<p>To find all or single file called tecmint.txt under /root directory of owner root.</p>
+<pre class="terminal" >$ find . -user bob
+.
+./abc.txt
+./abc
+./subdir
+./subdir/how.php
+./abc.php</pre>
+<p>We could also specify the name of the file or any name related criteria along with user criteria</p>
+<pre class="terminal" >$ find . -user bob -name &#039;*.php&#039;</pre>
+<p>Its very easy to see, how we can build up criteria after criteria to narrow down our search for matching files.</p>
+<h3>14. Search files belonging to group</h3>
+<p>Find all files that belong to a particular group.</p>
+<pre class="terminal" ># find /var/www -group developer</pre>
+<p>Did you know you could search your home directory by using the ~ symbol ?</p>
+<pre class="pre_text" >$ find ~ -name &quot;hidden.php&quot;</pre>
+<p>Easy!!</p>
+<h3>Search file and directories based on modification date and time</h3>		
+<!-- Time: 4.6968460083008E-5, Pos: 16192, Key: ad_unit_4 -->
+
+
+<p>Another great search criteria that the find command supports is modification and accessed date/times. This is very handy when we want to find out which files were modified as a certain time or date range. Lets take a few examples</p>
+<h3>15. Find files modified N days back</h3>
+<p>To find all the files which are modified 50 days back.</p>
+<pre class="terminal" ># find / -mtime 50</pre>
+<h3>16. Find files accessed in last N days</h3>
+<p>Find all files that were accessed in the last 50 days.</p>
+<pre class="terminal" ># find / -atime 50</pre>
+<h3>17. Find files modified in a range of days</h3>
+<p>Find all files that were modified between 50 to 100 days ago.</p>
+<pre class="terminal" ># find / -mtime +50 &ndash;mtime -100</pre>
+<h3>18. Find files changed in last N minutes.</h3>
+<p>Find files modified within the last 1 hour.</p>
+<pre class="terminal" >$ find /home/bob -cmin -60</pre>
+<h3>19. Files modified in last hour</h3>
+<p>To find all the files which are modified in last 1 hour.</p>
+<pre class="terminal" ># find / -mmin -60</pre>
+<h3>20. Find Accessed Files in Last 1 Hour</h3>
+<p>To find all the files which are accessed in last 1 hour.</p>
+<pre class="terminal" ># find / -amin -60</pre>
+<h3>21. Find files of given size</h3>
+<p>Search files and directories based on size. To find all 50MB files, use.</p>
+<pre class="terminal" ># find / -size 50M</pre>
+<h3>22. Find files in a size range</h3>
+<p>To find all the files which are greater than 50MB and less than 100MB.</p>
+<pre class="terminal" >$ find / -size +50M -size -100M</pre>
+<h3>23. Find largest and smallest files</h3>
+<p>The find command when used in combination with the ls and sort command can be used to list out the largest files.<br />
+The following command will display the 5 largest file in the current directory and its subdirectory. This may take a while to execute depending on the total number of files the command has to process.</p>
+<pre class="terminal" >$ find . -type f -exec ls -s {} \; | sort -n -r | head -5</pre>
+<p>Similary when sorted in ascending order, it would show the smallest files first</p>
+<pre class="terminal" >$ find . -type f -exec ls -s {} \; | sort -n | head -5</pre>
+<h3>24. Find empty files and directories</h3>
+<p>The following command uses the "empty" option of the find command, which finds all files that are empty.</p>
+<pre class="terminal" ># find /tmp -type f -empty</pre>
+<p>To file all empty directories use the type "d".</p>
+<pre class="terminal" >$ find ~/ -type d -empty</pre>
+<p>Really very simple and easy</p>
+<h3>Some advanced operations</h3>
+<p>The find command not only finds files based on a certain criteria, it can also act upon those files using any linux command. For example, we might want to delete some files.</p>
+<p>Here are some quick examples</p>
+<h3>25. List out the found files</h3>
+<p>Lets say we found files using find command, and now want to list them out as the ls command would have done. This is very easy.</p>		
+<!-- Time: 5.7220458984375E-5, Pos: 19759, Key: ad_unit_5 -->
+
+
+<pre class="terminal" >$ find . -exec ls -ld {} \;
+drwxrwxr-x 4 enlightened enlightened 4096 Aug 11 19:01 .
+-rw-rw-r-- 1 enlightened enlightened 0 Aug 11 16:25 ./abc.txt
+drwxrwxr-x 2 enlightened enlightened 4096 Aug 11 16:48 ./abc
+drwxrwxr-x 2 enlightened enlightened 4096 Aug 11 16:26 ./subdir
+-rw-rw-r-- 1 enlightened enlightened 0 Aug 11 16:26 ./subdir/how.php
+-rw-rw-r-- 1 enlightened enlightened 29 Aug 11 19:13 ./abc.php
+-rw-rw-r-- 1 enlightened enlightened 0 Aug 11 16:25 ./cool.php</pre>
+<h3>26. Delete all matching files or directories</h3>
+<p>The following command will remove all text files in the tmp directory.</p>
+<pre class="terminal" >$ find /tmp -type f -name &quot;*.txt&quot; -exec rm -f {} \;</pre>
+<p>The same operating can be carried out with directories, just put type d, instead of type f.</p>
+<p>Lets take another example where we want to delete files larger than 100MB</p>
+<pre class="terminal" >$ find /home/bob/dir -type f -name *.log -size +10M -exec rm -f {} \;</pre>
+			
+			
+	</article><!-- #post -->
+        
+
+    </div>
+    <!-- #content -->
+</main>
+<!-- #primary -->
+
+
+
+</div>
+<!-- box -->
+</div>
+<!-- wrap -->
+
+
+</div>
+<!-- #main .wrapper .site-inner -->
+
+
+
+</div>
+<!-- #page -->
+
+
+</body>
+</html><!-- WP Fastest Cache file was created in 0.517 seconds, on September 1, 2025 @ 11:08 pm --><!-- via php -->
